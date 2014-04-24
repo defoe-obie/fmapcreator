@@ -1,0 +1,6 @@
+/Users/lauraabresch/This/Programming/C# Workspace/FantasyMapCreatorFinal/FantasyMapCreatorFinal/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/Users/lauraabresch/This/Programming/C# Workspace/FantasyMapCreatorFinal/FantasyMapCreatorFinal/obj/x86/Debug/FantasyMapCreatorFinal.gtk-gui.gui.stetic
+/Users/lauraabresch/This/Programming/C# Workspace/FantasyMapCreatorFinal/FantasyMapCreatorFinal/bin/Debug/FantasyMapCreatorFinal.exe.mdb
+/Users/lauraabresch/This/Programming/C# Workspace/FantasyMapCreatorFinal/FantasyMapCreatorFinal/bin/Debug/FantasyMapCreatorFinal.exe
+/Users/lauraabresch/This/Programming/C# Workspace/FantasyMapCreatorFinal/FantasyMapCreatorFinal/obj/x86/Debug/FantasyMapCreatorFinal.exe
+/Users/lauraabresch/This/Programming/C# Workspace/FantasyMapCreatorFinal/FantasyMapCreatorFinal/obj/x86/Debug/FantasyMapCreatorFinal.exe.mdb
