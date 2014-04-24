@@ -24,7 +24,7 @@ namespace FantasyMapCreatorFinal
             this.ShowAll();
    
         }
-
+        
         protected void OnDeleteEvent(object sender, DeleteEventArgs a)
         {
             Application.Quit();
