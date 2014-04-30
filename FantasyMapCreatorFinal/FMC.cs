@@ -9,7 +9,7 @@ namespace FantasyMapCreatorFinal
         {
             Application.Init();
             FMCMainWindow win = new FMCMainWindow();
-            win.Show();
+            win.ShowAll();
             Application.Run();
         }
     }

@@ -10,16 +10,14 @@ namespace FantasyMapCreatorFinal
             this.Title = "Fantasy Map Creator V.1.0";
             this.DeleteEvent += OnDeleteEvent;
         
-            this.ModifyBg(Gtk.StateType.Normal, new Gdk.Color(128, 128, 128));
             //this.Maximize();
             this.Resize(800, 600);
             Gtk.VBox vb = new VBox(false, 0);
             Gtk.ScrolledWindow sw = new ScrolledWindow();
-        
-            Canvas c = new Canvas(640, 480);
-        
+            DrawingManager dm = new DrawingManager(400, 300);
+            Canvas c = dm.GUI;
             sw.AddWithViewport(c);
-            vb.Add(sw);
+           vb.Add(sw);
             this.Add(vb);
             this.ShowAll();
    

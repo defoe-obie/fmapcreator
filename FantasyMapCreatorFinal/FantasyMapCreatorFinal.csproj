@@ -62,10 +62,22 @@
     <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FMC.cs" />
-    <Compile Include="Canvas.cs" />
-    <Compile Include="Layer.cs" />
     <Compile Include="gtk-gui\FantasyMapCreatorFinal.MainWindow.cs" />
-    <Compile Include="FMCMainWindow.cs" />
+    <Compile Include="FMCGUI\LayerWidget.cs" />
+    <Compile Include="Drawing\Bitmap.cs" />
+    <Compile Include="Drawing\BitmapManipulator.cs" />
+    <Compile Include="Drawing\Canvas.cs" />
+    <Compile Include="Drawing\DrawingManager.cs" />
+    <Compile Include="Drawing\Layer.cs" />
+    <Compile Include="Drawing\LayerManipulator.cs" />
+    <Compile Include="FMCGUI\LayerListWidget.cs" />
+    <Compile Include="FMCGUI\LayerBox.cs" />
+    <Compile Include="FMCGUI\FMCMainWindow.cs" />
+    <Compile Include="FMCGUI\CanvasBox.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="FMCGUI\" />
+    <Folder Include="Drawing\" />
+  </ItemGroup>
 </Project>
