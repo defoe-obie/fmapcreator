@@ -12,7 +12,11 @@ namespace FantasyMapCreatorFinal
         public LayerListWidget()
         {   
             layerlistbox = new VBox();
-            this.Add(layerlistbox);
+            ScrolledWindow sw = new ScrolledWindow();
+            sw.HscrollbarPolicy = PolicyType.Always;
+            sw.AddWithViewport(layerlistbox);
+            
+            this.Add(sw);
             
             selectedIndex = -1;
             string[] names = FMCMainWindow.dm.GetLayerTitles();
@@ -30,7 +34,6 @@ namespace FantasyMapCreatorFinal
 
         public void AddLayerToWidget()
         {
-            
             LayerWidget lw;
             if (selectedIndex >= 0)
             {
@@ -38,38 +41,36 @@ namespace FantasyMapCreatorFinal
                 lw.IsSelected = false;
             }
             string name = FMCMainWindow.dm.CurrentLayer.Name;
-            lw = new LayerWidget(name + layerlistbox.Children.Length + " " + selectedIndex);
+            lw = new LayerWidget(name);
             lw.IsSelected = true;
             layerlistbox.PackEnd(lw, false, false, 0);
-            selectedIndex = layerlistbox.Children.Length - 1 - FMCMainWindow.dm.CurrentLayerIndex;
-            //layerlistbox.ReorderChild(lw, 0);
-            // TODO: Add this back in when testing on such things can actually be done.
+            layerlistbox.ReorderChild(lw, FMCMainWindow.dm.CurrentLayerIndex);
             layerlistbox.ShowAll();
             
         }
-        //BLAH BLAH BLAH OVERRIDE IT SO THAT IT IS COUNTING INDICES FROM THE FUCKINGBOTTOM!
+        
         protected override bool OnButtonPressEvent(Gdk.EventButton evnt)
         {
-            System.Console.WriteLine("Yes, I know.");
-            //double x_root = evnt.XRoot;
-            //double y_root = evnt.YRoot;
-            double x = evnt.X;
-            double y = evnt.Y;
+            //int x, y;
+            //layerlistbox.GetPointer(out x, out y);
+            //double x = evnt.X;
+            //double y = (this.Allocation.Height - evnt.Y);
             LayerWidget lw = (LayerWidget)layerlistbox.Children[selectedIndex];
-            lw.IsSelected = false;
-            int layerListIndex = (int)(y / lw.HeightRequest);
-            lw = (LayerWidget)layerlistbox.Children[layerListIndex];
-            lw.IsSelected = true;
-            selectedIndex = layerListIndex;
-            FMCMainWindow.dm.CurrentLayerIndex = layerlistbox.Children.Length - 1 - layerListIndex;
-            
-            //selectedLayer = layerlistbox.Children.Length - 1 - FMCMainWindow.dm.CurrentLayerIndex;
-            // Recall that the listbox packs the items in bottom to top.
-            //FMCMainWindow.dm.CurrentLayerIndex = reverseSelectedLayer - layerlistbox.Children.Length + 1;
-            int la = FMCMainWindow.dm.CurrentLayerIndex;
-            this.QueueDraw();
-            
-            return base.OnButtonPressEvent(evnt);
+            int y = (int)(evnt.Y - (layerlistbox.Allocation.Height - lw.HeightRequest * layerlistbox.Children.Length));
+            if (y >= 0)
+            {
+                int newIndex = (int)(y / lw.HeightRequest);
+                if ( newIndex >= layerlistbox.Children.Length){
+                    return true;
+                }
+                lw.IsSelected = false;
+                selectedIndex = newIndex;
+                lw = (LayerWidget)layerlistbox.Children[selectedIndex];
+                lw.IsSelected = true;
+                FMCMainWindow.dm.CurrentLayerIndex = layerlistbox.Children.Length - 1 - selectedIndex;
+                this.QueueDraw();
+            }
+            return true;
         }
     }
 }

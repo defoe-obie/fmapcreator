@@ -6,19 +6,19 @@ namespace FantasyMapCreatorFinal
 {
     public class LayerBox : VBox
     {
-        //private VBox layerpanel;
         private LayerListWidget layernames;
         private Toolbar layertools;
-        public int SelectedLayer{ get; set; }
-        
-        //public VBox GUI{ get { return layerpanel; } }
 
-        public LayerBox(): base()
+        public int SelectedLayer{ get; set; }
+        public LayerBox() : base()
         {
             this.Homogeneous = false;
-            this.Spacing = 3;
-            this.SetSizeRequest(100, -1);
-                
+            this.Spacing = 0;
+            this.SetSizeRequest(120, -1);
+        }
+
+        public void PopulateLayerBox()
+        {
             
             layernames = new LayerListWidget();
             layernames.SelectionNotifyEvent += LayerNotifySelected;
@@ -27,29 +27,26 @@ namespace FantasyMapCreatorFinal
             layertools = new Toolbar();
             
             layerlabel.SetAlignment(0.0f, 0.5f);
-            // TODO: Worry about this crap later... Background colors.
-            //layerlabel.ModifyBase(StateType.Normal, new Gdk.Color(128, 128, 128));
-            //layerlabel.ModifyBg(StateType.Normal, new Gdk.Color(128, 0, 0));
             this.PackStart(layerlabel, false, false, 5);
             
-            //PopulateLayerNames();
-            this.PackStart(layernames, false, false, 0);
+            this.Add(layernames);
            
             PopulateLayerTools();
             this.PackEnd(layertools, false, false, 0);
         }
+
         private void LayerNotifySelected(object sender, Gtk.SelectionNotifyEventArgs evnt)
         {
             Console.WriteLine("LayerGUI Notify Request");
             
         }
-        
+
         private void LayerRequestSelected(object sender, Gtk.SelectionRequestEventArgs evnt)
         {
             Console.WriteLine("LayerGUI Selection Request");
             
         }
-        
+
         private void PopulateLayerTools()
         {
             
@@ -71,20 +68,42 @@ namespace FantasyMapCreatorFinal
             
         }
 
-        private void OnAddLayer(object sender, EventArgs args)
+        public void CreateInitialLayer()
         {
-            // TODO: Add in new layer dialog.
-            FMCMainWindow.dm.AddNewLayer("UntitledX", new LayerProperties());
-            layernames.AddLayerToWidget();
-            layernames.QueueDraw();   
+                   
+            CreateLayerDialog cld = new CreateLayerDialog(new Definitions.LType[]{Definitions.LType.Ocean},"Ocean Layer");
+            cld.Response += delegate(object o, ResponseArgs responseargs)
+            {
+                ResponseType rt = responseargs.ResponseId;
+                if (rt == ResponseType.Accept)
+                {
+                    FMCMainWindow.dm.AddNewLayer(cld.NewLayerName, new LayerProperties(cld.LayerTypeName, cld.NewData));
+             //       layernames.AddLayerToWidget();
+               //     layernames.QueueDraw();           
+                }
+            };
+            cld.Run();
+            cld.Destroy();
+            
         }
 
-//        protected override bool OnExposeEvent(Gdk.EventExpose evnt)
-//        {
-//            return base.OnExposeEvent(evnt);
-//            
-//        }
-        
+        private void OnAddLayer(object sender, EventArgs args)
+        {
+            CreateLayerDialog cld = new CreateLayerDialog();
+            cld.Response += delegate(object o, ResponseArgs responseargs)
+            {
+                ResponseType rt = responseargs.ResponseId;
+                if (rt == ResponseType.Accept)
+                {
+                    FMCMainWindow.dm.AddNewLayer(cld.NewLayerName, new LayerProperties(cld.LayerTypeName, cld.NewData));
+                    layernames.AddLayerToWidget();
+                    layernames.QueueDraw();           
+                }
+            };
+            cld.Run();
+            cld.Destroy();
+            
+        }
     }
 }
 

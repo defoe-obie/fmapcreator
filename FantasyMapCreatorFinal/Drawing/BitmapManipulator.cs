@@ -16,15 +16,17 @@ namespace FantasyMapCreatorFinal
         private ImageSurface CreateMaskFromAlpha(Bitmap bitmap)
         {
             
-             ImageSurface maskSurface = bitmap.ConvertToSurface();
+            ImageSurface maskSurface = bitmap.ConvertToSurface();
             
-            Cairo.Context cr = new Cairo.Context(maskSurface);
-            cr.SetSourceRGB(0, 0, 0);
+            using (Cairo.Context cr = new Cairo.Context(maskSurface))
+            {
+                cr.SetSourceRGB(0, 0, 0);
             
-            cr.MaskSurface(maskSurface, 0, 0);
+                cr.MaskSurface(maskSurface, 0, 0);
             
-            ((IDisposable)cr.GetTarget()).Dispose();
-            ((IDisposable)cr).Dispose();
+                ((IDisposable)cr.GetTarget()).Dispose();
+                ((IDisposable)cr).Dispose();
+            }
             return maskSurface;
              
         }

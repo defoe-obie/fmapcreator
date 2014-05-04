@@ -90,8 +90,7 @@ namespace FantasyMapCreatorFinal
             this.width = width;
             this.height = height;
             canvasCreated = true;
-            layerRenderNeeded = false;
-            FMCMainWindow.dm.AddNewLayer("Tester", new LayerProperties());
+            layerRenderNeeded = true;
             currentLayer = FMCMainWindow.dm.CurrentLayer;
             
             workingSurface = new ImageSurface(Format.Argb32, width, height);
@@ -103,6 +102,8 @@ namespace FantasyMapCreatorFinal
             background.MotionNotifyEvent += OnDrawing;
             background.AddEvents((int)Gdk.EventMask.ButtonReleaseMask);
             background.ButtonReleaseEvent += OnDrawingClickRelease;
+            
+            background.QueueDraw();
         }
 
         private void OnDrawingClick(object sender, ButtonPressEventArgs args)

@@ -11,7 +11,7 @@ namespace FantasyMapCreatorFinal
         
         //TODO: Move this to a more appropriate location
         public static DrawingManager dm { get; private set; }
-      
+        public static Definitions dr{ get; private set;}
         private LayerBox layerbox;
         private CanvasBox canvasbox;
         
@@ -21,9 +21,12 @@ namespace FantasyMapCreatorFinal
             this.DeleteEvent += OnDeleteEvent;
             this.Resize(800, 500);       
             dm = new DrawingManager(400,300);
+            dr = new Definitions();
             canvasbox = new CanvasBox();
-            canvasbox.CreateCanvasBackground(dm.Width, dm.Height);
             layerbox = new LayerBox();
+            layerbox.CreateInitialLayer();
+            canvasbox.CreateCanvasBackground(dm.Width, dm.Height);
+            layerbox.PopulateLayerBox();
             
             VBox mainVBox = new VBox(false, 1);
             HBox mainHBox = new HBox(false, 1);

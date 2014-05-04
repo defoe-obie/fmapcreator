@@ -1,5 +1,6 @@
 ﻿using System;
 using Cairo;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace FantasyMapCreatorFinal
@@ -7,17 +8,36 @@ namespace FantasyMapCreatorFinal
     // Struct
     public struct PathNode
     {
-        private PointD point;
+        private Cairo.PointD point;
         private Layer.NextPointFunction pointFunction;
 
-        public PathNode(PointD newPoint, Layer.NextPointFunction newPointFunction)
+        public PathNode(Cairo.PointD nPoint, Layer.NextPointFunction npf)
         {
-            point = newPoint;
-            pointFunction = newPointFunction;
+            point = nPoint;
+            pointFunction = npf;
         }
 
-        public PointD Point{ get { return point; } }
-        public Layer.NextPointFunction PointFunction{ get { return pointFunction; } }
+        public PointD Point()
+        {
+            return point;
+        }
+
+        public Layer.NextPointFunction PointFunction()
+        {
+            return pointFunction;
+        }
+    }
+
+    public struct LayerProperties
+    {
+        public string LayerTypeName;
+        public ArrayList Data;
+
+        public LayerProperties(string ltn, ArrayList newdata)
+        {
+            LayerTypeName = ltn;
+            Data = newdata;
+        }
     }
 
     public class Layer : Cairo.ImageSurface
@@ -25,65 +45,36 @@ namespace FantasyMapCreatorFinal
         // Properties
         private List<PathNode> queuedPaths;
         private List<PathNode> erasePaths;
-        private List<PathNode> surfacePaths;
+
+        public List<PathNode> surfacePaths{ get; set; }
+
         private ImageSurface mask;
-        //private LayerProperties layerproperties;
-        //private LayerType layertype;
-        private bool layerHasChanged;
-        
-        public string Name{get;set;}
-        //public LayerType LType{ get;set;}
-        public LayerProperties Properties{ get; set; }
+        public bool layerHasChanged;
+
+        public string Name{ get; set; }
+
+        private LayerProperties lp;
+
         public ImageSurface Mask{ get { return mask; } }
-        //public LayerProperties LayerProperites{ get { return layerproperties; } set { layerproperties = value; } }
 
-        //public LayerType LType{ get { return layertype; } set { layertype = value; } }
-
-        // E-e-e-e-e-e-e-numerations!
-        public enum LayerType
-        {
-            Ocean,
-            Island,
-            Mountain,
-            Forest,
-            Road,
-            Glyph,
-            Otherterrain
-        }
-        
         public enum NextPointFunction
         {
             MoveTo,
             LineTo
         }
-        
         // Constructors
-        public Layer(int width, int height, string name, LayerProperties lp): base(Cairo.Format.Argb32, width, height){
+        public Layer(int width, int height, string name, LayerProperties lp) : base(Cairo.Format.Argb32, width, height)
+        {
             mask = new ImageSurface(Cairo.Format.Argb32, this.Width, this.Height);
             Name = name;
+            this.lp = lp;
             queuedPaths = new List<PathNode>();
             erasePaths = new List<PathNode>();
             surfacePaths = new List<PathNode>();
-            layerHasChanged = false;
+            layerHasChanged = true;
         }
-//        public Layer(string filename) : base(filename)
-//        { 
-//            initialize();
-//        }
-//
-//        public Layer(int width, int height) : base(Cairo.Format.Argb32, width, height)
-//        {
-//            initialize();
-//        }
-//
-//        public Layer(Cairo.Format format, int width, int height) : base(format, width, height)
-//        { 
-//            initialize();
-//        }
-        // Private Methods
-        
-        // Public methods
-        public void AddToPath(PointD nextPoint, NextPointFunction npf)
+
+        public void AddToPath(PointD nextPoint, Layer.NextPointFunction npf)
         {
             PathNode newNode = new PathNode(nextPoint, npf);
             layerHasChanged = true;
@@ -99,67 +90,68 @@ namespace FantasyMapCreatorFinal
 
         public void RenderMask()
         {
-            Cairo.Context cr2 = new Context(mask);
-            // Draw new paths
-            if (queuedPaths.Count > 0)
+            using (Cairo.Context cr2 = new Context(mask))
             {
-                ImageSurface maskSurface = new Cairo.ImageSurface(Cairo.Format.Argb32, Width, Height);
-                Cairo.Context cr = new Context(maskSurface);
-                
-                foreach (PathNode pn in queuedPaths)
+                // Draw new paths
+                if (queuedPaths.Count > 0)
                 {
-                    switch (pn.PointFunction)
+                    ImageSurface maskSurface = new Cairo.ImageSurface(Cairo.Format.Argb32, Width, Height);
+                    using (Cairo.Context cr = new Context(maskSurface))
                     {
+                
+                        foreach (PathNode pn in queuedPaths)
+                        {
+                            switch (pn.PointFunction())
+                            {
                        
-                        case(NextPointFunction.MoveTo):
-                            cr.MoveTo(pn.Point);
-                            break;       
-                        case(NextPointFunction.LineTo):
-                            cr.LineTo(pn.Point);
-                            break;
+                                case(NextPointFunction.MoveTo):
+                                    cr.MoveTo(pn.Point());
+                                    break;       
+                                case(NextPointFunction.LineTo):
+                                    cr.LineTo(pn.Point());
+                                    break;
+                            }
+                        }
+                        cr.SetSourceRGBA(0, 0, 0, 1);
+                        cr.Fill();
+                
+                        ((IDisposable)cr.GetTarget()).Dispose();
+                        ((IDisposable)cr).Dispose(); 
                     }
+                    cr2.SetSourceRGBA(0, 0, 0, 1);
+                    cr2.MaskSurface(maskSurface, 0, 0);
+                    queuedPaths.Clear();
                 }
-                cr.SetSourceRGBA(0, 0, 0, 1);
-                cr.Fill();
-                
-                ((IDisposable)cr.GetTarget()).Dispose();
-                ((IDisposable)cr).Dispose(); 
-                
-                cr2.SetSourceRGBA(0, 0, 0, 1);
-                cr2.MaskSurface(maskSurface, 0, 0);
-                queuedPaths.Clear();
-            }
-            // Erase new erase paths
-            if (erasePaths.Count > 0)
-            {
-                Console.WriteLine("Erasing");
-                foreach (PathNode pn in erasePaths)
+                // Erase new erase paths
+                if (erasePaths.Count > 0)
                 {
-                    switch (pn.PointFunction)
+                    Console.WriteLine("Erasing");
+                    foreach (PathNode pn in erasePaths)
                     {
-                        case(NextPointFunction.MoveTo):
-                            cr2.MoveTo(pn.Point);
-                            break;
-                        case(NextPointFunction.LineTo):
-                            cr2.LineTo(pn.Point);
-                            break;
+                        switch (pn.PointFunction())
+                        {
+                            case(NextPointFunction.MoveTo):
+                                cr2.MoveTo(pn.Point());
+                                break;
+                            case(NextPointFunction.LineTo):
+                                cr2.LineTo(pn.Point());
+                                break;
                             
+                        }
                     }
-                }
-                cr2.Operator = Cairo.Operator.Clear;
-                cr2.Fill();
-                erasePaths.Clear();
-            }  
+                    cr2.Operator = Cairo.Operator.Clear;
+                    cr2.Fill();
+                    erasePaths.Clear();
+                }  
                 
-            ((IDisposable)cr2.GetTarget()).Dispose();
-            ((IDisposable)cr2).Dispose(); 
+                ((IDisposable)cr2.GetTarget()).Dispose();
+                ((IDisposable)cr2).Dispose(); 
+            }
         }
 
-        public void RenderLayer()
+        public void GenerateEdgePath()
         {
-            if ( !layerHasChanged){
-                return;
-            }
+            
             Console.WriteLine("Rendering Layer");
             RenderMask();
             Console.WriteLine("Doing EdgeGen");
@@ -174,66 +166,74 @@ namespace FantasyMapCreatorFinal
             
             Console.WriteLine("Finished EdgeGen");
             
+        }
+
+        public void CreateEdgeCairoPath(Cairo.Context cr)
+        {
             if (surfacePaths.Count > 0)
             {
-                ImageSurface renderSurface = new Cairo.ImageSurface(this.Format, Width, Height);
-                Cairo.Context cr = new Context(renderSurface);
+                //ImageSurface renderSurface = new Cairo.ImageSurface(this.Format, Width, Height);
+                //Cairo.Context cr = new Context(renderSurface);
                 
                 foreach (PathNode pn in surfacePaths)
                 {
-                    switch (pn.PointFunction)
+                    switch (pn.PointFunction())
                     {
                        
                         case(NextPointFunction.MoveTo):
-                            cr.MoveTo(pn.Point);
+                            cr.MoveTo(pn.Point());
                             break;       
                         case(NextPointFunction.LineTo):
-                            cr.LineTo(pn.Point);
+                            cr.LineTo(pn.Point());
                             break;
                     }
                 }
-                // TODO: ContourWidth is actually twice what it will be displayed as.
-                int contourspacing = 5;
-                int contournumber = 3;
-                int contourwidth = 2;
-                cr.LineWidth = contourwidth;
-                cr.Antialias = Cairo.Antialias.Default;
-                cr.LineCap = Cairo.LineCap.Round;
-                cr.LineJoin = Cairo.LineJoin.Round;
+            }
+        }
+
+        public void RenderLayer()
+        {
+            if (!layerHasChanged)
+            {
+                return;
+            }
+//            if (surfacePaths.Count > 0)
+//            {
+            ImageSurface renderSurface = new Cairo.ImageSurface(this.Format, Width, Height);
+            using (Cairo.Context cr = new Context(renderSurface))
+            {
+//                
+//                foreach (PathNode pn in surfacePaths)
+//                {
+//                    switch (pn.PointFunction())
+//                    {
+//                       
+//                        case(NextPointFunction.MoveTo):
+//                            cr.MoveTo(pn.Point());
+//                            break;       
+//                        case(NextPointFunction.LineTo):
+//                            cr.LineTo(pn.Point());
+//                            break;
+//                    }
+//                }
+//                //This is the proper call here:
+                FMCMainWindow.dr.Render(this, cr, lp.LayerTypeName, lp.Data);
                 
-                for (int i = contournumber; i > 0; --i)
-                {
-                    cr.LineWidth = i * (contourwidth + contourspacing) + contourwidth;
-                    cr.SetSourceRGBA(0, 0.2, 0.7, 1.0 / (i + (1 / contournumber)));
-                    cr.StrokePreserve();
-                    cr.LineWidth = cr.LineWidth - contourwidth;
-                    cr.SetSourceRGBA(1, 1, 1, 1);
-                    cr.StrokePreserve();
-                }
-                
-                //cr.SetSourceRGBA(0.8, 0.7, 0.11, 0.5);
-                cr.LineWidth = Math.Max(contourwidth, 2);
-                cr.SetSourceRGBA(0, 0, 0, 1);
-                cr.StrokePreserve();
-                
-                cr.SetSourceRGBA(1, 1, 1, 1);
-                cr.MaskSurface(mask, 0, 0);
                 
                 ((IDisposable)cr.GetTarget()).Dispose();
                 ((IDisposable)cr).Dispose();   
-                
-                Cairo.Context cr3 = new Cairo.Context(this);
-                var la = cr3.Operator;
+            }
+            using (Cairo.Context cr3 = new Cairo.Context(this))
+            {
                 cr3.Operator = Operator.Clear;
-                //cr3.SetSourceRGBA(1, 1, 1, 0);
                 cr3.Paint();
                 cr3.Operator = Operator.Over;
                 cr3.SetSourceSurface(renderSurface, 0, 0);
                 cr3.Paint();
                 ((IDisposable)cr3.GetTarget()).Dispose();
                 ((IDisposable)cr3).Dispose();
-           
             }
+            
             Console.WriteLine("Done Rendering Layer");
             layerHasChanged = false;
         }

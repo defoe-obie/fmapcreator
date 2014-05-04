@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{45979567-C114-43D5-920A-976222A94182}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -66,18 +66,27 @@
     <Compile Include="FMCGUI\LayerWidget.cs" />
     <Compile Include="Drawing\Bitmap.cs" />
     <Compile Include="Drawing\BitmapManipulator.cs" />
-    <Compile Include="Drawing\Canvas.cs" />
     <Compile Include="Drawing\DrawingManager.cs" />
     <Compile Include="Drawing\Layer.cs" />
-    <Compile Include="Drawing\LayerManipulator.cs" />
     <Compile Include="FMCGUI\LayerListWidget.cs" />
     <Compile Include="FMCGUI\LayerBox.cs" />
     <Compile Include="FMCGUI\FMCMainWindow.cs" />
     <Compile Include="FMCGUI\CanvasBox.cs" />
+    <Compile Include="FMCGUI\CreateLayerDialog.cs" />
+    <Compile Include="FMCGUI\Definitions\CairoRoutine.cs" />
+    <Compile Include="FMCGUI\Definitions\GUIRoutine.cs" />
+    <Compile Include="FMCGUI\Definitions\Definitions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="FMCGUI\" />
     <Folder Include="Drawing\" />
+    <Folder Include="FMCGUI\Definitions\" />
+    <Folder Include="FMCGUI\Definitions\Islands\" />
+    <Folder Include="FMCGUI\Definitions\Ocean\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FMCGUI\Definitions\Islands\MultipleContour.Island" />
+    <None Include="FMCGUI\Definitions\Ocean\SingleColor.Ocean" />
   </ItemGroup>
 </Project>

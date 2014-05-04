@@ -1,0 +1,9 @@
+﻿Ocean
+singlecolor
+Single Colour
+1
+0=colorchooser:Ocean Colour,0,128,180
+cairobegin
+setcolor=@0
+paint
+cairoend

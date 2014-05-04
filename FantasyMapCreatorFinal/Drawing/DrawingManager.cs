@@ -6,11 +6,7 @@ namespace FantasyMapCreatorFinal
 {
     public class DrawingManager
     {
-        //private Canvas canvas;
-        //private LayerManipulator lm;
         private List<Layer> layers;
-        //private int currentLayerIndex;
-        //public Canvas GUI{ get { return canvas; } }
         public int Width{ get; private set; }
 
         public int Height{ get; private set; }
@@ -30,18 +26,13 @@ namespace FantasyMapCreatorFinal
 
         public DrawingManager(int width, int height)
         {
-            // lm = new LayerManipulator();
             layers = new List<Layer>();
             Width = width;
             Height = height;
             CurrentLayerIndex = -1;
-            //  canvas = new Canvas(width, height);
+            
         }
 
-        public void SetUpDrawingManager(LayerProperties oceanProperties, LayerProperties islandProperties)
-        {
-            throw new NotImplementedException();
-        }
 
         public string[] GetLayerTitles()
         {
@@ -64,9 +55,9 @@ namespace FantasyMapCreatorFinal
             return false;
         }
 
-        public void AddNewLayer(string newname, LayerProperties newLayerProperties)
+        public void AddNewLayer(string newname, LayerProperties lp)
         {
-            Layer newLayer = new Layer(this.Width, this.Height, newname, newLayerProperties);
+            Layer newLayer = new Layer(this.Width, this.Height, newname, lp);
             CurrentLayerIndex = CurrentLayerIndex + 1;
             layers.Insert(CurrentLayerIndex, newLayer);
         }
